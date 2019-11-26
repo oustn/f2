@@ -12,6 +12,7 @@ const GroupAction = require('./group-action');
 const Chart = require('../chart/chart');
 
 let timeline;
+let referenceCharts = 0
 Element.prototype.animate = function() {
   const attrs = Util.mix({}, this.get('attrs'));
   return new Animator(this, attrs, timeline);
@@ -324,7 +325,8 @@ function _getAnimateCfgByShapeType(type, chart) {
 
 module.exports = {
   afterCanvasInit(/* chart */) {
-    timeline = new Timeline();
+    timeline = timeline || new Timeline();
+    referenceCharts += 1
     timeline.play();
   },
   beforeCanvasDraw(chart) {
@@ -407,6 +409,10 @@ module.exports = {
     }
   },
   afterCanvasDestroyed(/* chart */) {
-    timeline.stop();
+    referenceCharts -= 1
+    
+    if (referenceCharts <= 0) {
+      timeline.stop();
+    }
   }
 };

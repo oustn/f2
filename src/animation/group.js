@@ -9,6 +9,7 @@ const Timeline = require('../graphic/animate/timeline');
 const Animator = require('../graphic/animate/animator');
 
 let timeline;
+let referenceCharts = 0
 Shape.prototype.animate = function() {
   const attrs = Util.mix({}, this.get('attrs'));
   return new Animator(this, attrs, timeline);
@@ -76,7 +77,8 @@ function getAnimateCfg(geomType, animateCfg) {
 
 module.exports = {
   afterCanvasInit(/* chart */) {
-    timeline = new Timeline();
+    timeline = timeline || new Timeline();
+    referenceCharts += 1
     timeline.play();
   },
   beforeCanvasDraw(chart) {
@@ -110,6 +112,10 @@ module.exports = {
     });
   },
   afterCanvasDestroyed(/* chart */) {
-    timeline.stop();
+    referenceCharts -= 1
+  
+    if (referenceCharts <= 0) {
+      timeline.stop();
+    }
   }
 };
